@@ -37,7 +37,6 @@ class _SplashScreenState extends State<SplashScreen> {
               height: 150,
             ),
           ),
-          CircularProgressIndicator()
         ],
       ),
     );

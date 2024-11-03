@@ -9,7 +9,7 @@ class ApiServices {
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
-      print(response.body);
+      // print(response.body);
       return GroceryModel.fromJson(jsonDecode(response.body));
     } else {
       return null;
