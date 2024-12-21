@@ -88,28 +88,47 @@ class _ProductTileState extends State<ProductTile> {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  int quantity = int.parse(_quantityController.text);
-                  // Add to cart
-                  final cartProvider =
-                      Provider.of<CartProvider>(context, listen: false);
-                  cartProvider.addItem(
-                    CartItem(
-                      id: widget.id,
-                      title: widget.title,
-                      price: widget.price,
-                      image: widget.image,
-                      quantity: quantity,
+              const SizedBox(height: 15),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xff14213d),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                  );
-                  setState(() {
-                    _isBought = true;
-                  });
-                  Navigator.pop(context); // Close the bottom sheet
-                },
-                child: const Text('Add to Cart'),
+                  ),
+                  onPressed: () {
+                    int quantity = int.parse(_quantityController.text);
+                    // Add to cart
+                    final cartProvider =
+                        Provider.of<CartProvider>(context, listen: false);
+                    cartProvider.addItem(
+                      CartItem(
+                        id: widget.id,
+                        title: widget.title,
+                        price: widget.price,
+                        image: widget.image,
+                        quantity: quantity,
+                      ),
+                    );
+                    setState(() {
+                      _isBought = true;
+                    });
+                    Future.delayed(const Duration(seconds: 5), () {
+                      setState(() {
+                        _isBought = false;
+                      });
+                    });
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    'Add to Cart',
+                    style: GoogleFonts.lexend(color: Colors.white),
+                  ),
+                ),
               ),
             ],
           ),
@@ -165,7 +184,7 @@ class _ProductTileState extends State<ProductTile> {
                           color: Colors.red,
                         ),
                         onPressed: () =>
-                            favoriteProvider.toggleFavorite(widget.id),
+                            favoriteProvider.toggleFavorite(widget.id, context),
                       ),
                     ),
                   ],

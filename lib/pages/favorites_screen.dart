@@ -14,10 +14,13 @@ class FavoritesScreen extends StatelessWidget {
     final favoriteIds = favoriteProvider.favoriteProducts;
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade200,
+      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        backgroundColor: Colors.grey.shade200,
-        title: const Text('Favorites'),
+        backgroundColor: Colors.grey.shade100,
+        title: Text(
+          'Favorites',
+          style: GoogleFonts.lexend(),
+        ),
         iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: favoriteIds.isNotEmpty
@@ -27,7 +30,6 @@ class FavoritesScreen extends StatelessWidget {
                 int productId = favoriteIds[index];
                 var product = groceryProvider.products
                     .firstWhere((p) => p.id == productId, orElse: () => null!);
-
                 // ignore: unnecessary_null_comparison
                 if (product != null) {
                   return Padding(
@@ -48,7 +50,7 @@ class FavoritesScreen extends StatelessWidget {
                         trailing: IconButton(
                           icon: const Icon(Icons.remove),
                           onPressed: () {
-                            favoriteProvider.toggleFavorite(productId);
+                            favoriteProvider.toggleFavorite(productId, context);
                           },
                         ),
                       ),

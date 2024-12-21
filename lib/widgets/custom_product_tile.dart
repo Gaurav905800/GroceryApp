@@ -85,7 +85,7 @@ class CustomProductTile extends StatelessWidget {
                 if (product.rating != null)
                   Row(
                     children: [
-                      Icon(Icons.star, color: Colors.amber, size: 16),
+                      const Icon(Icons.star, color: Colors.amber, size: 16),
                       const SizedBox(width: 4),
                       Text(
                         product.rating!.toString(),

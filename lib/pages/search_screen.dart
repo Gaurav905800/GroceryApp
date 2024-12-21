@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:grocery_app/pages/detail_screen.dart';
 import 'package:grocery_app/state/provider.dart';
 import 'package:provider/provider.dart';
 import 'package:grocery_app/models/grocery_model.dart';
@@ -8,6 +9,7 @@ class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _SearchScreenState createState() => _SearchScreenState();
 }
 
@@ -49,9 +51,10 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
         elevation: 1,
+        backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.black),
         title: TextField(
           controller: _searchController,
@@ -82,7 +85,7 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(12.0),
         child: _filteredItems.isNotEmpty
             ? ListView.builder(
                 itemCount: _filteredItems.length,
@@ -94,13 +97,24 @@ class _SearchScreenState extends State<SearchScreen> {
                       style: GoogleFonts.poppins(fontSize: 18),
                     ),
                     leading: const Icon(
-                      Icons.local_grocery_store,
-                      color: Colors.blue,
+                      Icons.search,
+                      color: Colors.grey,
                     ),
-                    subtitle: Text(
-                      '\$${product.price}',
-                      style: GoogleFonts.poppins(fontSize: 16),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.call_made),
+                      onPressed: () {
+                        _searchController.text = product.title ?? '';
+                        _filterSearchResults(_searchController.text);
+                      },
                     ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DetailScreen(product: product),
+                        ),
+                      );
+                    },
                   );
                 },
               )

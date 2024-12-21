@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:grocery_app/pages/login_screen.dart';
+import 'package:grocery_app/services/auth/auth_services.dart';
 import 'package:grocery_app/widgets/custom_button.dart';
 import 'package:grocery_app/widgets/custom_textfiled.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  final void Function()? onTap;
+
+  const RegisterScreen({super.key, this.onTap});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -13,25 +15,66 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
+  final authServices = AuthServices();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _reenterPasswordController =
       TextEditingController();
+  bool _isLoading = false;
+
+  Future<void> _signUp() async {
+    if (_formKey.currentState?.validate() != true) return;
+
+    setState(() => _isLoading = true);
+    try {
+      final response = await authServices.signUpWithEmailPassword(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+      );
+
+      if (response?.session != null) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Registration successful!'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pop(); // Redirect to the previous screen or login
+      } else {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Registration failed. Please try again.'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error: $e"),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
 
   // Validation functions
   String? _validateName(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your full name';
-    }
-    return null;
+    return (value == null || value.isEmpty)
+        ? 'Please enter your full name'
+        : null;
   }
 
   String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your email';
-    }
+    if (value == null || value.isEmpty) return 'Please enter your email';
     if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
       return 'Enter a valid email';
     }
@@ -39,9 +82,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   String? _validatePhone(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your phone number';
-    }
+    if (value == null || value.isEmpty) return 'Please enter your phone number';
     if (!RegExp(r'^[0-9]{10}$').hasMatch(value)) {
       return 'Enter a valid 10-digit phone number';
     }
@@ -49,19 +90,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter a password';
-    }
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters';
-    }
+    if (value == null || value.isEmpty) return 'Please enter a password';
+    if (value.length < 6) return 'Password must be at least 6 characters';
     return null;
   }
 
   String? _validateReenterPassword(String? value) {
-    if (value != _passwordController.text) {
-      return 'Passwords do not match';
-    }
+    if (value != _passwordController.text) return 'Passwords do not match';
     return null;
   }
 
@@ -74,7 +109,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: Form(
             key: _formKey,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 15),
@@ -128,42 +162,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   validator: _validateReenterPassword,
                 ),
                 const SizedBox(height: 30),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const LoginScreen(),
+                _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : Padding(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            InkWell(
+                              onTap: widget.onTap,
+                              child: Text(
+                                'Login',
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w500,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
                             ),
-                          );
-                        },
-                        child: Text(
-                          'Login',
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w500,
-                            decoration: TextDecoration.underline,
-                          ),
+                            const SizedBox(width: 20),
+                            Expanded(
+                              child: CustomButton(
+                                text: 'Sign Up',
+                                onPressed: _signUp,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 50),
-                      Expanded(
-                        child: CustomButton(
-                          text: 'Continue',
-                          onPressed: () {
-                            if (_formKey.currentState?.validate() == true) {
-                              // Handle registration logic
-                            }
-                          },
-                        ),
-                      )
-                    ],
-                  ),
-                ),
               ],
             ),
           ),

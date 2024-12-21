@@ -7,20 +7,21 @@ import 'package:grocery_app/state/provider.dart';
 import 'package:provider/provider.dart';
 import 'package:grocery_app/state/favorite_provider.dart';
 
-class Tabs extends StatefulWidget {
-  const Tabs({super.key});
+class AllTabs extends StatefulWidget {
+  const AllTabs({super.key});
 
   @override
-  State<Tabs> createState() => _TabsState();
+  State<AllTabs> createState() => _AllTabsState();
 }
 
-class _TabsState extends State<Tabs> {
+class _AllTabsState extends State<AllTabs> {
   int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<FavoriteProvider>(context);
-    Provider.of<GroceryProvider>(context);
+    // Ensure we're listening to the providers without rebuilding
+    Provider.of<FavoriteProvider>(context, listen: false);
+    Provider.of<GroceryProvider>(context, listen: false);
 
     return Scaffold(
       body: IndexedStack(
@@ -28,7 +29,7 @@ class _TabsState extends State<Tabs> {
         children: const [
           HomeScreen(),
           FavoritesScreen(),
-          BagScreen(),
+          CartScreen(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -45,7 +46,7 @@ class _TabsState extends State<Tabs> {
         ),
         onTap: (index) {
           setState(() {
-            _currentIndex = index; // Update the current index when tapped
+            _currentIndex = index;
           });
         },
         items: const [

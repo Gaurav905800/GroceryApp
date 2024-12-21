@@ -1,6 +1,10 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:grocery_app/pages/bag_screen.dart';
 import 'package:grocery_app/pages/detail_screen.dart';
+import 'package:grocery_app/pages/login_screen.dart';
+import 'package:grocery_app/services/auth/auth_services.dart';
 import 'package:grocery_app/state/provider.dart';
 import 'package:grocery_app/widgets/custom_search.dart';
 import 'package:grocery_app/widgets/product_tile.dart';
@@ -10,13 +14,14 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _HomeScreenState createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String? selectedCategory = 'All';
-  List<int> favoriteIds = [];
+  String selectedCategory = 'All';
+  final List<int> favoriteIds = [];
+  bool isDropdownOpen = false;
+  final AuthServices authServices = AuthServices();
 
   @override
   void initState() {
@@ -26,20 +31,24 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void toggleFavorite(int id) {
-    setState(() {
-      if (favoriteIds.contains(id)) {
-        favoriteIds.remove(id);
-      } else {
-        favoriteIds.add(id);
-      }
-    });
+  void _logoutUser(BuildContext context) {
+    authServices.signOut();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Logged out successfully!'),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade200,
+      backgroundColor: Colors.grey.shade100,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -55,32 +64,87 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildAppBar() {
     return SliverAppBar(
       floating: true,
-      pinned: false,
       snap: true,
-      backgroundColor: Colors.grey.shade200,
+      backgroundColor: Colors.grey.shade100,
       expandedHeight: 190.0,
-      flexibleSpace: const FlexibleSpaceBar(
+      actions: [
+        InkWell(
+          onTap: () => setState(() => isDropdownOpen = !isDropdownOpen),
+          child: const Align(
+            alignment: Alignment.centerRight,
+            child: Padding(
+              padding: EdgeInsets.only(
+                right: 15,
+              ),
+              child: CircleAvatar(
+                child: Icon(Icons.person),
+              ),
+            ),
+          ),
+        ),
+        if (isDropdownOpen) _buildProfileDropdown(),
+      ],
+      flexibleSpace: FlexibleSpaceBar(
         background: Padding(
-          padding: EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Best Products',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black,
-                ),
+              Row(
+                children: [
+                  Text(
+                    'Best Products',
+                    style: GoogleFonts.lexend(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const Spacer(),
+                ],
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
                 'Perfect Choice!',
-                style: TextStyle(fontSize: 20, color: Colors.black),
+                style: GoogleFonts.lexend(fontSize: 20, color: Colors.black),
               ),
-              SizedBox(height: 15),
-              CustomSearch(),
+              const SizedBox(height: 15),
+              const CustomSearch(),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileDropdown() {
+    return Positioned(
+      top: 70,
+      right: 10,
+      child: Material(
+        elevation: 4,
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        child: InkWell(
+          onTap: () {
+            setState(() => isDropdownOpen = false);
+            _logoutUser(context);
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: Row(
+              children: [
+                const Icon(Icons.logout, color: Colors.red),
+                const SizedBox(width: 8),
+                Text(
+                  'Logout',
+                  style: GoogleFonts.lexend(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -95,53 +159,51 @@ class _HomeScreenState extends State<HomeScreen> {
           builder: (context, groceryProvider, child) {
             if (groceryProvider.isLoading) {
               return const Center(child: CircularProgressIndicator());
-            } else if (groceryProvider.groceryData != null &&
-                groceryProvider.groceryData!.products != null) {
-              var categories = ['All'] +
-                  groceryProvider.groceryData!.products!
-                      .map((product) => product.category ?? '')
-                      .toSet()
-                      .toList();
-
-              return SizedBox(
-                height: 40,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: categories.length,
-                  itemBuilder: (context, index) {
-                    var category = categories[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: ChoiceChip(
-                        label: Text(category),
-                        selected: selectedCategory == category,
-                        onSelected: (isSelected) {
-                          setState(() {
-                            selectedCategory = isSelected ? category : 'All';
-                          });
-                        },
-                        backgroundColor: Colors.grey[200],
-                        selectedColor: const Color.fromARGB(255, 135, 35, 28),
-                        labelStyle: TextStyle(
-                          color: selectedCategory == category
-                              ? Colors.white
-                              : Colors.black,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          side: const BorderSide(color: Colors.transparent),
-                        ),
-                        checkmarkColor: Colors.white,
-                      ),
-                    );
-                  },
-                ),
-              );
-            } else {
-              return const Center(
-                child: Text('No Categories Available'),
-              );
             }
+
+            var categories = ['All'] +
+                (groceryProvider.groceryData?.products ?? [])
+                    .map((product) => product.category ?? '')
+                    .toSet()
+                    .toList();
+
+            return SizedBox(
+              height: 40,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: categories.length,
+                itemBuilder: (context, index) {
+                  var category = categories[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: ChoiceChip(
+                      label: Text(
+                        category,
+                        style: GoogleFonts.lexend(),
+                      ),
+                      selected: selectedCategory == category,
+                      onSelected: (isSelected) {
+                        setState(() {
+                          selectedCategory = isSelected ? category : 'All';
+                        });
+                      },
+                      backgroundColor: Colors.grey[200],
+                      selectedColor: const Color(0xff87351C),
+                      labelStyle: TextStyle(
+                        color: selectedCategory == category
+                            ? Colors.white
+                            : Colors.black,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: BorderSide.none,
+                      ),
+                      checkmarkColor: Colors.white,
+                    ),
+                  );
+                },
+              ),
+            );
           },
         ),
       ),
@@ -155,54 +217,61 @@ class _HomeScreenState extends State<HomeScreen> {
           return const SliverFillRemaining(
             child: Center(child: CircularProgressIndicator()),
           );
-        } else if (groceryProvider.groceryData != null &&
-            groceryProvider.groceryData!.products != null) {
-          var filteredProducts = selectedCategory == 'All'
-              ? groceryProvider.groceryData!.products!
-              : groceryProvider.groceryData!.products!
-                  .where((product) => product.category == selectedCategory)
-                  .toList();
+        }
+        var products = groceryProvider.groceryData?.products ?? [];
+        var filteredProducts = selectedCategory == 'All'
+            ? products
+            : products.where((p) => p.category == selectedCategory).toList();
 
-          return SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                var product = filteredProducts[index];
-                return InkWell(
-                  child: ProductTile(
+        if (filteredProducts.isEmpty) {
+          return SliverFillRemaining(
+            child: Center(
+                child: Text(
+              'No Products Available',
+              style: GoogleFonts.lexend(),
+            )),
+          );
+        }
+
+        return SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              var product = filteredProducts[index];
+              return OpenContainer(
+                transitionType: ContainerTransitionType.fadeThrough,
+                transitionDuration: const Duration(milliseconds: 500),
+                openBuilder: (context, _) {
+                  return DetailScreen(product: product);
+                },
+                closedBuilder: (context, openContainer) {
+                  return ProductTile(
                     title: product.title!,
                     description: product.description!,
                     discountedPrice: product.discountPercentage!,
                     price: product.price!,
                     image: product.thumbnail!,
                     id: product.id!,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const BagScreen(),
-                        ),
-                      );
-                    },
-                    onFavoriteToggled: toggleFavorite,
-                  ),
-                  onTap: () {
-                    Navigator.push(
+                    onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => DetailScreen(product: product),
-                      ),
-                    );
-                  },
-                );
-              },
-              childCount: filteredProducts.length,
-            ),
-          );
-        } else {
-          return const SliverFillRemaining(
-            child: Center(child: Text('No Products Available')),
-          );
-        }
+                          builder: (context) => const CartScreen()),
+                    ),
+                    onFavoriteToggled: (id) {
+                      setState(() {
+                        if (favoriteIds.contains(id)) {
+                          favoriteIds.remove(id);
+                        } else {
+                          favoriteIds.add(id);
+                        }
+                      });
+                    },
+                  );
+                },
+              );
+            },
+            childCount: filteredProducts.length,
+          ),
+        );
       },
     );
   }

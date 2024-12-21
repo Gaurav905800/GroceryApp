@@ -1,8 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:grocery_app/pages/register_screen.dart';
+import 'package:grocery_app/pages/tabs.dart';
+import 'package:grocery_app/services/auth/auth_services.dart';
 import 'package:grocery_app/widgets/custom_button.dart';
 import 'package:grocery_app/widgets/custom_textfiled.dart';
-// import 'package:grocery_app/widgets/custom_textfield.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,10 +17,54 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final AuthServices authServices = AuthServices();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
 
-  // Validation logic
+  Future<void> _login() async {
+    if (_formKey.currentState?.validate() != true) return;
+
+    setState(() => _isLoading = true);
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    try {
+      final response =
+          await authServices.signInWithEmailPassword(email, password);
+      if (response?.session != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Login successful'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const AllTabs(),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Login failed. Please check your credentials.'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your email';
@@ -32,7 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
       return 'Please enter your password';
     }
     if (value.length < 6) {
-      return 'assword must be at least 6 characters';
+      return 'Password must be at least 6 characters';
     }
     return null;
   }
@@ -72,11 +120,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(width: 5),
                       GestureDetector(
                         onTap: () {
-                          // Navigate to sign up screen
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const RegisterScreen(),
+                            ),
+                          );
                         },
                         child: const Text(
                           'Create account',
-                          style: TextStyle(color: Colors.red),
+                          style: TextStyle(color: Color(0xff14213d)),
                         ),
                       ),
                     ],
@@ -101,30 +153,29 @@ class _LoginScreenState extends State<LoginScreen> {
                     alignment: Alignment.centerRight,
                     child: GestureDetector(
                       onTap: () {
-                        // Handle forgot password
+                        // Implement forgot password functionality
                       },
                       child: const Text(
                         'Forgot Password?',
-                        style: TextStyle(color: Colors.red),
+                        style: TextStyle(color: Color(0xff14213d)),
                       ),
                     ),
                   ),
                   const SizedBox(height: 30),
-                  CustomButton(
-                    text: 'Login',
-                    onPressed: () {
-                      if (_formKey.currentState?.validate() == true) {
-                        // Handle login logic
-                      }
-                    },
-                  ),
+                  _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : CustomButton(
+                          text: 'Login',
+                          onPressed: _login,
+                        ),
                   const SizedBox(height: 30),
-                  Center(
-                    child: Text(
-                      'or login with',
-                      style: TextStyle(color: Colors.grey.shade500),
-                    ),
-                  ),
+                  // Center(
+                  //   child: Text(
+                  //     'or login with',
+                  //     style: TextStyle(color: Colors.grey.shade500),
+                  //   ),
+                  // ),
+                  // // Add social login buttons if needed
                 ],
               ),
             ),
