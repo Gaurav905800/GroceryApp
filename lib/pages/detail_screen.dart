@@ -286,6 +286,7 @@ class _DetailScreenState extends State<DetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Title and Rating
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -319,6 +320,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 ),
               ],
             ),
+
             const SizedBox(height: 5),
             if (widget.product.brand != null &&
                 widget.product.brand!.isNotEmpty)
@@ -328,6 +330,7 @@ class _DetailScreenState extends State<DetailScreen> {
                   Text(widget.product.brand!),
                 ],
               ),
+
             const SizedBox(height: 14),
             Text(
               widget.product.description!,
@@ -336,7 +339,10 @@ class _DetailScreenState extends State<DetailScreen> {
                 color: Colors.grey.shade700,
               ),
             ),
-            const SizedBox(height: 10),
+
+            const Divider(height: 30, thickness: 1),
+
+            // Dimensions
             const Text(
               'Dimensions:',
               style: TextStyle(
@@ -350,34 +356,147 @@ class _DetailScreenState extends State<DetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (widget.product.dimensions!.width != null)
-                    Text(
-                      'Width: ${widget.product.dimensions!.width} cm',
-                      style: GoogleFonts.lato(
-                          fontSize: 14, color: Colors.grey.shade700),
-                    ),
+                    Text('Width: ${widget.product.dimensions!.width} cm'),
                   if (widget.product.dimensions!.height != null)
-                    Text(
-                      'Height: ${widget.product.dimensions!.height} cm',
-                      style: GoogleFonts.lato(
-                          fontSize: 14, color: Colors.grey.shade700),
-                    ),
+                    Text('Height: ${widget.product.dimensions!.height} cm'),
                   if (widget.product.dimensions!.depth != null)
-                    Text(
-                      'Depth: ${widget.product.dimensions!.depth} cm',
-                      style: GoogleFonts.lato(
-                          fontSize: 14, color: Colors.grey.shade700),
-                    ),
+                    Text('Depth: ${widget.product.dimensions!.depth} cm'),
                 ],
               ),
+
             const SizedBox(height: 10),
             if (widget.product.weight != null)
+              Text('Weight: ${widget.product.weight} kg'),
+
+            const Divider(height: 30, thickness: 1),
+
+            // Warranty
+            if (widget.product.warrantyInformation != null &&
+                widget.product.warrantyInformation!.isNotEmpty)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _sectionTitle('Warranty'),
+                  Text(widget.product.warrantyInformation!),
+                  const SizedBox(height: 16),
+                ],
+              ),
+
+            // Shipping
+            if (widget.product.shippingInformation != null &&
+                widget.product.shippingInformation!.isNotEmpty)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _sectionTitle('Shipping'),
+                  Text(widget.product.shippingInformation!),
+                  const SizedBox(height: 16),
+                ],
+              ),
+
+            // Availability
+            if (widget.product.availabilityStatus != null)
+              Row(
+                children: [
+                  _sectionTitle('Availability'),
+                  const SizedBox(width: 8),
+                  Text(
+                    widget.product.availabilityStatus!,
+                    style: TextStyle(
+                      color: widget.product.availabilityStatus == 'In Stock'
+                          ? Colors.green
+                          : Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+
+            const SizedBox(height: 16),
+
+            // Return Policy
+            if (widget.product.returnPolicy != null)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _sectionTitle('Return Policy'),
+                  Text(widget.product.returnPolicy!),
+                  const SizedBox(height: 16),
+                ],
+              ),
+
+            // MOQ
+            if (widget.product.minimumOrderQuantity != null)
               Text(
-                'Weight: ${widget.product.weight} kg',
-                style:
-                    GoogleFonts.lato(fontSize: 14, color: Colors.grey.shade700),
+                'Minimum Order Quantity: ${widget.product.minimumOrderQuantity}',
+                style: GoogleFonts.lato(fontSize: 14),
+              ),
+
+            const SizedBox(height: 16),
+
+            // Tags
+            if (widget.product.tags != null && widget.product.tags!.isNotEmpty)
+              Wrap(
+                spacing: 8,
+                children: widget.product.tags!
+                    .map((tag) => Chip(label: Text(tag)))
+                    .toList(),
+              ),
+
+            const Divider(height: 30, thickness: 1),
+
+            // Reviews
+            if (widget.product.reviews != null &&
+                widget.product.reviews!.isNotEmpty)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _sectionTitle('Reviews'),
+                  ...widget.product.reviews!.take(2).map(
+                        (review) => ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: const Icon(Icons.reviews),
+                          title: Text(review.reviewerName ?? 'Anonymous'),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(review.comment ?? ''),
+                              Text(
+                                review.date ?? '',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: List.generate(
+                              review.rating ?? 0,
+                              (index) => const Icon(
+                                Icons.star,
+                                size: 16,
+                                color: Colors.amber,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                ],
               ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _sectionTitle(String title) {
+    return Text(
+      title,
+      style: GoogleFonts.lato(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
       ),
     );
   }

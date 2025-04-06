@@ -16,7 +16,6 @@ class AuthServices {
       );
       return response;
     } catch (error) {
-      print("Sign-in error: $error");
       return null;
     }
   }
@@ -31,7 +30,6 @@ class AuthServices {
       );
       return response;
     } catch (error) {
-      print("Sign-up error: $error");
       return null;
     }
   }
@@ -42,7 +40,6 @@ class AuthServices {
       await _supabase.auth.signOut();
       return true;
     } catch (error) {
-      print("Sign-out error: $error");
       return false;
     }
   }
