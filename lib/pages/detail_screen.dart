@@ -1,7 +1,3 @@
-// ignore_for_file: unused_field
-
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:grocery_app/models/cart_model.dart';
@@ -23,7 +19,6 @@ class DetailScreen extends StatefulWidget {
 }
 
 class _DetailScreenState extends State<DetailScreen> {
-  bool _isBought = false;
   final TextEditingController _quantityController =
       TextEditingController(text: '1');
 
@@ -33,7 +28,6 @@ class _DetailScreenState extends State<DetailScreen> {
     super.dispose();
   }
 
-  Timer? _timer;
   void _handleBuyPressed() {
     showModalBottomSheet(
       context: context,
@@ -112,18 +106,9 @@ class _DetailScreenState extends State<DetailScreen> {
                       ),
                     );
 
-                    setState(() {
-                      _isBought = true;
-                    });
+                    setState(() {});
 
                     // Schedule the delayed task
-                    _timer = Timer(const Duration(seconds: 5), () {
-                      if (mounted) {
-                        setState(() {
-                          _isBought = false;
-                        });
-                      }
-                    });
 
                     Navigator.pop(context);
                   },

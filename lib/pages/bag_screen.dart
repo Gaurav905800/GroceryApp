@@ -2,9 +2,74 @@ import 'package:flutter/material.dart';
 import 'package:grocery_app/state/cart_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
-class CartScreen extends StatelessWidget {
+class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
+
+  @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  late Razorpay _razorpay;
+
+  @override
+  void initState() {
+    super.initState();
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+  }
+
+  @override
+  void dispose() {
+    _razorpay.clear();
+    super.dispose();
+  }
+
+  void openCheckout(double amount) {
+    var options = {
+      'key': 'rzp_test_1AbCdEFGhIJkLm', // Replace with your Razorpay Key
+      'amount': (amount * 100).toInt(), // Amount in paise
+      'name': 'Grocery App',
+      'description': 'Grocery Order Payment',
+      'prefill': {
+        'contact': '9999999999',
+        'email': 'test@example.com',
+      },
+      'external': {
+        'wallets': ['paytm']
+      }
+    };
+
+    try {
+      _razorpay.open(options);
+    } catch (e) {
+      debugPrint('Error: $e');
+    }
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Payment Success! ID: ${response.paymentId}")),
+    );
+    // Optionally: clear cart or navigate
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Payment Failed: ${response.message}")),
+    );
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+          content: Text("External Wallet Selected: ${response.walletName}")),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +109,6 @@ class CartScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 6.0),
                         child: Stack(
                           children: [
-                            // Cart Item Container
                             Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
@@ -61,7 +125,6 @@ class CartScreen extends StatelessWidget {
                               ),
                               child: Row(
                                 children: [
-                                  // Item Image
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(8),
                                     child: Image.network(
@@ -103,7 +166,6 @@ class CartScreen extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                  // Quantity Controls and Total Price
                                   Column(
                                     children: [
                                       Row(
@@ -145,7 +207,6 @@ class CartScreen extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            // Remove Button
                             Positioned(
                               top: 5,
                               right: 5,
@@ -178,14 +239,12 @@ class CartScreen extends StatelessWidget {
                     },
                   ),
           ),
-          // Footer Section
           if (cartProvider.items.isNotEmpty)
             Container(
               color: Colors.white,
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  // Total Price
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -207,7 +266,6 @@ class CartScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  // Continue Shopping Button
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xff14213d),
@@ -216,7 +274,9 @@ class CartScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      openCheckout(cartProvider.totalPrice);
+                    },
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

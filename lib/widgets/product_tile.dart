@@ -226,11 +226,11 @@ class _ProductTileState extends State<ProductTile> {
                             '\$${widget.price}',
                             style: GoogleFonts.lato(
                               fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                              fontSize: 14,
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 2),
+                            padding: const EdgeInsets.symmetric(horizontal: 1),
                             decoration: BoxDecoration(
                               color: const Color(0xff14213d),
                               borderRadius: BorderRadius.circular(50),

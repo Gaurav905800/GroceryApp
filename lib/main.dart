@@ -3,6 +3,7 @@ import 'package:grocery_app/pages/splash_screen.dart';
 import 'package:grocery_app/state/cart_provider.dart';
 import 'package:grocery_app/state/favorite_provider.dart';
 import 'package:grocery_app/state/provider.dart';
+
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/services.dart';
