@@ -5,9 +5,7 @@ import 'package:grocery_app/widgets/custom_button.dart';
 import 'package:grocery_app/widgets/custom_textfiled.dart';
 
 class RegisterScreen extends StatefulWidget {
-  final void Function()? onTap;
-
-  const RegisterScreen({super.key, this.onTap});
+  const RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -170,7 +168,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             InkWell(
-                              onTap: widget.onTap,
+                              onTap: () {
+                                Navigator.of(context).pop();
+                              },
                               child: Text(
                                 'Login',
                                 style: GoogleFonts.poppins(

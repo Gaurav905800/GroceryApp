@@ -1,26 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:grocery_app/pages/splash_screen.dart';
 import 'package:grocery_app/state/cart_provider.dart';
 import 'package:grocery_app/state/favorite_provider.dart';
 import 'package:grocery_app/state/provider.dart';
-
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/services.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Load .env file before accessing dotenv.env
+  await dotenv.load();
+
   await Supabase.initialize(
-    url: "https://oaeljyquxgfqjqdqxmyi.supabase.co",
-    anonKey:
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hZWxqeXF1eGdmcWpxZHF4bXlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzEzOTIzMzYsImV4cCI6MjA0Njk2ODMzNn0.02a-viWGUBNq0QiwBe126bDgafNZfHluERFItGr8sSo",
+    url: dotenv.env['SUPABASE_URL'] ?? '',
+    anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
   );
+
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Color.fromARGB(255, 105, 30, 25),
   ));
-  runApp(
-    const MyApp(),
-  );
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -36,7 +39,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
+        title: 'Grocery App',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
             seedColor: const Color.fromARGB(255, 197, 102, 102),

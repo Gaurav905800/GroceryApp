@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:grocery_app/pages/bag_screen.dart';
 import 'package:grocery_app/pages/detail_screen.dart';
-import 'package:grocery_app/pages/login_screen.dart';
+import 'package:grocery_app/pages/profile_page.dart';
 import 'package:grocery_app/services/auth/auth_services.dart';
 import 'package:grocery_app/state/provider.dart';
 import 'package:grocery_app/widgets/custom_search.dart';
@@ -31,20 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _logoutUser(BuildContext context) {
-    authServices.signOut();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Logged out successfully!'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginScreen()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,7 +55,13 @@ class _HomeScreenState extends State<HomeScreen> {
       expandedHeight: 190.0,
       actions: [
         InkWell(
-          onTap: () => setState(() => isDropdownOpen = !isDropdownOpen),
+          onTap: () => {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProfilePage(),
+                ))
+          },
           child: const Align(
             alignment: Alignment.centerRight,
             child: Padding(
@@ -82,7 +74,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
-        if (isDropdownOpen) _buildProfileDropdown(),
       ],
       flexibleSpace: FlexibleSpaceBar(
         background: Padding(
@@ -111,40 +102,6 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 15),
               const CustomSearch(),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProfileDropdown() {
-    return Positioned(
-      top: 70,
-      right: 10,
-      child: Material(
-        elevation: 4,
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        child: InkWell(
-          onTap: () {
-            setState(() => isDropdownOpen = false);
-            _logoutUser(context);
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            child: Row(
-              children: [
-                const Icon(Icons.logout, color: Colors.red),
-                const SizedBox(width: 8),
-                Text(
-                  'Logout',
-                  style: GoogleFonts.lexend(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
           ),
         ),
       ),
