@@ -69,7 +69,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 right: 15,
               ),
               child: CircleAvatar(
-                child: Icon(Icons.person),
+                backgroundImage: NetworkImage(
+                    "https://plus.unsplash.com/premium_photo-1678197937465-bdbc4ed95815?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29ufGVufDB8fDB8fHww"),
               ),
             ),
           ),
