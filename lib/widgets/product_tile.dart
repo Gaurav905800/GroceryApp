@@ -223,7 +223,7 @@ class _ProductTileState extends State<ProductTile> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            '\$${widget.price}',
+                            '\u20B9${widget.price}',
                             style: GoogleFonts.lato(
                               fontWeight: FontWeight.bold,
                               fontSize: 14,

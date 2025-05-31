@@ -150,7 +150,7 @@ class _CartScreenState extends State<CartScreen> {
                                         ),
                                         const SizedBox(height: 5),
                                         Text(
-                                          'Price: \$${item.price.toStringAsFixed(2)}',
+                                          'Price: \u20B9${item.price.toStringAsFixed(2)}',
                                           style: const TextStyle(
                                             fontSize: 14,
                                             color: Colors.grey,
@@ -195,7 +195,7 @@ class _CartScreenState extends State<CartScreen> {
                                         ],
                                       ),
                                       Text(
-                                        '\$${(item.price * item.quantity).toStringAsFixed(2)}',
+                                        '\u20B9${(item.price * item.quantity).toStringAsFixed(2)}',
                                         style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
@@ -256,7 +256,7 @@ class _CartScreenState extends State<CartScreen> {
                         ),
                       ),
                       Text(
-                        '\$${cartProvider.totalPrice.toStringAsFixed(2)}',
+                        '\u20B9${cartProvider.totalPrice.toStringAsFixed(2)}',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,

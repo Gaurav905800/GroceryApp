@@ -10,8 +10,6 @@ import 'package:flutter/services.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Load .env file before accessing dotenv.env
   await dotenv.load();
 
   await Supabase.initialize(

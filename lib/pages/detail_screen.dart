@@ -509,7 +509,7 @@ class _DetailScreenState extends State<DetailScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '\$${widget.product.price!.toStringAsFixed(2)}',
+              '\u20B9${widget.product.price!.toStringAsFixed(2)}',
               style: GoogleFonts.lato(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
